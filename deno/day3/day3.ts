@@ -6,25 +6,40 @@ const content = text
                 .map(line => line.split("").map(n => Number(n)))
 
 var result = 0
+// const numTarget = 2 -- FOR PART 1 
+const numTarget = 12
 const len = content[0].length
 
 for (const line of content) {
     
+    let max = -1
     let top = -1
 
-    for (let i = 0; i < len; i++) {
-    
-        let start = line[i] * 10
-        let leftMax = Math.max(...line.slice(i+1))
+    const numDigits = line.length
+    const bufferStart = numDigits - numTarget
 
-        start += leftMax
+        let cap = -1
+        let nextBiggestNum = -1
 
-        if (start > top) {
-            top = start
+    let numBuffer = []
+
+    for (let i = bufferStart; i < numDigits; i++) {
+        let start = i
+        nextBiggestNum = start
+
+        // console.log("Starting at", start, "next is", nextBiggestNum)
+        for (let j = start; j > cap; j--) {
+            if (line[j] >= line[start] && line[j] >= line[nextBiggestNum]) {
+                nextBiggestNum = j
+            }
         }
+
+        cap = nextBiggestNum
+        // console.log("Next biggest for", line[start], "is", line[nextBiggestNum], ", cap is now at", cap)
+        numBuffer.push(line[nextBiggestNum])
     }
 
-    result += top
+    result += Number(numBuffer.join(''))
 }
 
 console.log(result)
