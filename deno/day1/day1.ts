@@ -1,6 +1,9 @@
 const text = await Deno.readTextFile('input');
 
-const content = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+const content = text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
 
 const rotations = []
 
@@ -28,13 +31,6 @@ for (const rotation of rotations) {
         newDial = currentDial + rotation.dial
     }
 
-    // console.log(rotation, currentDial, Math.floor((Math.abs(newDial)+100)/100))
-    // if (newDial < 0) {
-    //     result += Math.floor((Math.abs(newDial)+100)/100)
-    // } else if (newDial > 0) {
-    //     result += Math.floor(Math.abs(newDial)/100)
-    // }
-    //
     currentDial = (newDial % 100 + 100) % 100
 
     if (currentDial === 0) {
