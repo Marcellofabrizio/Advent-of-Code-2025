@@ -12,9 +12,6 @@ const len = content[0].length
 
 for (const line of content) {
 
-    let max = -1
-    let top = -1
-
     const numDigits = line.length
     const bufferStart = numDigits - numTarget
 
