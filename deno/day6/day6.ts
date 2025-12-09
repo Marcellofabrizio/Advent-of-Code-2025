@@ -1,35 +1,52 @@
 const text = await Deno.readTextFile("input");
+const content = text.split("\n").filter((l) => l.length > 0);
 
-const content = text.split("\n").filter((line) => line.length > 0);
+const digitsLines = content.slice(0, -1);
+const operations = content.at(-1)!.trim().split(/\s+/);
 
-const numbers = content.slice(0, -1).map((line) =>
-  line.split(" ").filter((line) => line.length > 0).map((num) =>
-    parseInt(num.trim(), 10)
-  )
+const matrix = digitsLines.map((line) =>
+  line.split("").flatMap((
+    ch,
+  ) => (ch === " " ? [0] : ch.split("").map((d) => parseInt(d, 10))))
 );
 
-const rows = numbers.length;
-const cols = numbers[0]?.length ?? 0;
+const rows = matrix.length;
+const cols = matrix[0]?.length ?? 0;
 
-const operations = content.at(-1)!
-  .split(" ")
-  .map((op) => op.trim())
-  .filter((op) => op.length > 0);
-
-let result = 0;
-
-for (let col = 0; col < Math.min(cols, operations.length); col++) {
-  const op = operations[col];
-  if (op === "*") {
-    let acc = 1;
-    for (let row = 0; row < rows; row++) acc *= numbers[row][col];
-    result += acc;
-  } else if (op === "+") {
-    let acc = 0;
-    for (let row = 0; row < rows; row++) acc += numbers[row][col];
-    result += acc;
+const zeroCols = new Set<number>();
+for (let c = 0; c < cols; c++) {
+  let zero = true;
+  for (let r = 0; r < rows; r++) {
+    if (matrix[r][c] !== 0) {
+      zero = false;
+      break;
+    }
   }
+  if (zero) zeroCols.add(c);
 }
 
-console.log({ result });
+let result = 0;
+let numsBuffer: number[] = [];
+let opsIdx = operations.length - 1;
 
+for (let c = cols - 1; c >= -1; c--) {
+  if (c === -1 || zeroCols.has(c)) {
+    const op = operations[opsIdx--];
+    if (op === "*") {
+      result += numsBuffer.reduce((a, b) => a * b, 1);
+    } else if (op === "+") {
+      result += numsBuffer.reduce((a, b) => a + b, 0);
+    }
+    numsBuffer = [];
+    continue;
+  }
+
+  let colNum = "";
+  for (let r = 0; r < rows; r++) {
+    const v = matrix[r][c];
+    if (v !== 0) colNum += v;
+  }
+  if (colNum.length > 0) numsBuffer.push(parseInt(colNum, 10));
+}
+
+console.log(result);
